@@ -64,9 +64,10 @@ else:
             median_val = df[target_num].median()
             
             fig_hist = px.histogram(
-                df, x=target_num, color_discrete_sequence=['#3498db'], alpha=0.85,
+                df, x=target_num, color_discrete_sequence=['#3498db'],
                 title=f"Histogram Distribusi {target_num.replace('_', ' ').title()}"
             )
+            fig_hist.update_traces(opacity=0.85)
             fig_hist.add_vline(x=mean_val, line_dash="dash", line_color="red", annotation_text=f"Mean: {mean_val:.1f}")
             fig_hist.add_vline(x=median_val, line_dash="dash", line_color="orange", annotation_text=f"Median: {median_val:.1f}")
             fig_hist.update_layout(xaxis_title=target_num.replace('_', ' ').title(), yaxis_title="Jumlah Sampel")
@@ -143,13 +144,9 @@ else:
 
     st.info(
         "Kesimpulan Analisis Data & Model: \n"
-        "1) Faktor Risiko Utama: Hasil EDA menunjukkan korelasi kuat antara durasi tidur yang tidak ideal (di bawah 7 jam) "
-        "serta tingginya screen time sebelum tidur terhadap peningkatan risiko stres tingkat tinggi. Pola ini diperkuat oleh "
-        "tingginya prevalensi gangguan tidur berupa mimpi buruk pada kelompok stres kronis. \n"
-        "2) Faktor Protektif: Aktivitas luar ruangan (outdoor time) dan manajemen waktu istirahat teratur terbukti secara "
-        "signifikan menjaga stabilitas emosional subjek pada tingkat stres rendah. \n"
-        "3) Solusi Prevensi (Model AI): Berdasarkan pola-pola historis tersebut, model Deep Learning yang diintegrasikan di bawah "
-        "berhasil mempelajari interaksi kompleks dari 20 fitur gaya hidup ini secara simultan dengan tingkat akurasi evaluasi sebesar 96.73%, menghasilkan kalkulasi probabilitas stres real-time yang presisi."
+        "1) Faktor Risiko Utama: Hasil eksplorasi menunjukkan adanya pengaruh kuat dari durasi tidur yang rendah serta tingginya screen time sebelum tidur terhadap peningkatan level stres. Pola gangguan tidur ini juga diperkuat oleh data karakteristik kelompok harian, di mana subjek dengan indikator mimpi buruk dan sering terbangun malam memiliki kecenderungan masuk ke dalam kategori stres tingkat tinggi. \n"
+        "2) Faktor Protektif & Gaya Hidup: Berdasarkan analisis korelasi dan distribusi variabel penunjang, aktivitas positif seperti meditasi dan manajemen waktu outdoor terbukti memiliki koefisien korelasi yang bernilai negatif terhadap stress_level, yang menandakan bahwa faktor-faktor tersebut bekerja sebagai peredam atau penahan laju risiko stres. \n"
+        "3) Solusi Prevensi (Model AI): Melalui pemetaan interaksi seluruh fitur gaya hidup tersebut, model Deep Learning yang ditanamkan pada sistem berhasil memberikan kalkulasi prediksi secara real-time dengan tingkat akurasi pengujian sebesar 96.73%. Hasil probabilitas ini dapat dijadikan landasan ilmiah untuk langkah intervensi dini."
     )
 
     st.subheader("Simulasi Interaktif Prediksi Model Real-Time")
