@@ -74,6 +74,43 @@ else:
             fig_job.update_layout(showlegend=False, xaxis_title="Jumlah Sampel", yaxis_title="Pekerjaan")
             st.plotly_chart(fig_job, use_container_width=True)
 
+    # Validasi visualisasi faktor numerik utama pendukung insight kesimpulan
+    st.write("#### Analisis Faktor Risiko Utama (Faktor Numerik)")
+    grafik_num1, grafik_num2 = st.columns(2)
+
+    with grafik_num1:
+        if 'durasi_tidur_menit' in df.columns and 'stress_level' in df.columns:
+            df_box_sleep = df.copy()
+            df_box_sleep['stress_level'] = df_box_sleep['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
+            df_box_sleep['Durasi Tidur (Jam)'] = df_box_sleep['durasi_tidur_menit'] / 60
+            
+            fig_sleep = px.box(
+                df_box_sleep,
+                x='stress_level',
+                y='Durasi Tidur (Jam)',
+                color='stress_level',
+                color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
+                title="Pengaruh Durasi Tidur terhadap Tingkat Stres"
+            )
+            fig_sleep.update_layout(showlegend=False, xaxis_title="Tingkat Stres")
+            st.plotly_chart(fig_sleep, use_container_width=True)
+
+    with grafik_num2:
+        if 'screen_sebelum_tidur' in df.columns and 'stress_level' in df.columns:
+            df_box_screen = df.copy()
+            df_box_screen['stress_level'] = df_box_screen['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
+            
+            fig_screen = px.box(
+                df_box_screen,
+                x='stress_level',
+                y='screen_sebelum_tidur',
+                color='stress_level',
+                color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
+                title="Pengaruh Screen Time Sebelum Tidur terhadap Tingkat Stres"
+            )
+            fig_screen.update_layout(showlegend=False, xaxis_title="Tingkat Stres", yaxis_title="Screen Time (Menit)")
+            st.plotly_chart(fig_screen, use_container_width=True)
+
     st.subheader("Analisis Hubungan Fitur Interaktif")
     fitur_pilihan = st.selectbox(
         "Pilih variabel gaya hidup untuk menganalisis korelasinya dengan tingkat stres:",
@@ -102,9 +139,15 @@ else:
         st.plotly_chart(fig_interaktif, use_container_width=True)
 
     st.info(
-        "Hasil EDA menunjukkan pola konsisten: durasi tidur kurang dari 7 jam dan screen time tinggi sebelum tidur berkorelasi "
-        "erat dengan peningkatan stres tingkat tinggi. Gangguan tidur seperti mimpi buruk juga mendominasi kelompok stres kronis, "
-        "sementara aktivitas luar ruangan (outdoor) berfungsi sebagai faktor pelindung stabilitas emosional."
+        "Kesimpulan Analisis Data & Model: "
+        "1) Faktor Risiko Utama: Hasil EDA menunjukkan korelasi kuat antara durasi tidur yang tidak ideal (di bawah 7 jam) "
+        "serta tingginya screen time sebelum tidur terhadap peningkatan risiko stres tingkat tinggi. Pola ini diperkuat oleh "
+        "tingginya prevalensi gangguan tidur berupa mimpi buruk pada kelompok stres kronis. "
+        "2) Faktor Protektif: Aktivitas luar ruangan (outdoor time) dan manajemen waktu istirahat teratur terbukti secara "
+        "signifikan menjaga stabilitas emosional subjek pada tingkat stres rendah. "
+        "3) Solusi Prevensi (Model AI): Berdasarkan pola-pola historis tersebut, model Deep Learning yang diintegrasikan di bawah "
+        "berhasil mempelajari interaksi kompleks dari 20 fitur gaya hidup ini secara simultan. Model mampu menghasilkan kalkulasi "
+        "probabilitas stres secara real-time sebagai landasan ilmiah untuk fitur intervensi dini pada sistem Tracker."
     )
 
     st.subheader("Simulasi Interaktif Prediksi Model Real-Time")
@@ -193,7 +236,6 @@ else:
                     'interaksi_sosial': int(input_interaksi)
                 }])
                 
-                # Sesuai urutan kolom dengan dataset training
                 input_filtered_df = raw_input_df[FINAL_FEATURES].copy()
                 
                 # Casting tipe data spesifik untuk mencegah error tensor graph pas inferensi
