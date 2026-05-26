@@ -22,97 +22,29 @@ if not os.path.exists(CSV_PATH):
 else:
     df = pd.read_csv(CSV_PATH)
     
-    st.subheader("Indikator Utama & Metrik Kesehatan Gaya Hidup")
-    m1, m2, m3, m4 = st.columns(4)
-    
-    with m1:
-        avg_sleep = df['durasi_tidur_menit'].mean() / 60 if 'durasi_tidur_menit' in df.columns else 0
-        st.metric(label="Rata-rata Durasi Tidur", value=f"{avg_sleep:.1f} Jam")
-    with m2:
-        avg_screen = df['screen_sebelum_tidur'].mean() if 'screen_sebelum_tidur' in df.columns else 0
-        st.metric(label="Rata-rata Screen Time", value=f"{avg_screen:.0f} Menit")
-    with m3:
-        mimpi_buruk_pct = (df['mimpi_buruk'].astype(str).str.lower().str.strip() == 'ya').sum() / len(df) * 100 if 'mimpi_buruk' in df.columns else 0
-        st.metric(label="Prevalensi Mimpi Buruk", value=f"{mimpi_buruk_pct:.1f}%")
-    with m4:
-        stres_tinggi_pct = (df['stress_level'] == 3).sum() / len(df) * 100 if 'stress_level' in df.columns else 0
-        st.metric(label="Proporsi Stres Tinggi", value=f"{stres_tinggi_pct:.1f}%")
+    st.subheader("Statistik Deskriptif")
+    st.dataframe(df.describe(include='all'), use_container_width=True)
 
     st.subheader("Visualisasi Insight (Exploratory Data Analysis)")
-    col_dist1, col_dist2 = st.columns(2)
+    col_eda1, col_eda2 = st.columns(2)
     
-    with col_dist1:
+    with col_eda1:
         if 'stress_level' in df.columns:
-            df_stress = df['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'}).value_counts().sort_index().reset_index()
-            df_stress.columns = ['Tingkat Stres', 'Jumlah']
+            df_stress = df['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'}).value_counts(normalize=True).reset_index()
+            df_stress.columns = ['Tingkat Stres', 'Persentase']
+            df_stress['Persentase'] = df_stress['Persentase'] * 100
             
             fig_stress = px.bar(
-                df_stress, x='Tingkat Stres', y='Jumlah', color='Tingkat Stres',
+                df_stress, x='Tingkat Stres', y='Persentase', color='Tingkat Stres',
                 color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
-                title="Distribusi Tingkat Stres Target"
+                text=df_stress['Persentase'].apply(lambda x: f"{x:.2f}%"),
+                title="Distribusi Tingkat Stres Target (Persentase)"
             )
-            fig_stress.update_layout(showlegend=False, xaxis_title="Kategori Stres", yaxis_title="Jumlah Sampel")
+            fig_stress.update_layout(showlegend=False, xaxis_title="Kategori Stres", yaxis_title="Persentase (%)")
+            fig_stress.update_traces(textposition='outside')
             st.plotly_chart(fig_stress, use_container_width=True)
             
-    with col_dist2:
-        target_num = st.selectbox(
-            "Pilih Variabel Numerik untuk Melihat Sebaran & Nilai Tengah:",
-            options=["durasi_tidur_menit", "screen_sebelum_tidur", "jam_kerja_menit", "waktu_outdoor", "tingkat_kecemasan"]
-        )
-        if target_num in df.columns:
-            mean_val = df[target_num].mean()
-            median_val = df[target_num].median()
-            
-            fig_hist = px.histogram(
-                df, x=target_num, color_discrete_sequence=['#3498db'],
-                title=f"Histogram Distribusi {target_num.replace('_', ' ').title()}"
-            )
-            fig_hist.update_traces(opacity=0.85)
-            fig_hist.add_vline(x=mean_val, line_dash="dash", line_color="red", annotation_text=f"Mean: {mean_val:.1f}")
-            fig_hist.add_vline(x=median_val, line_dash="dash", line_color="orange", annotation_text=f"Median: {median_val:.1f}")
-            fig_hist.update_layout(xaxis_title=target_num.replace('_', ' ').title(), yaxis_title="Jumlah Sampel")
-            st.plotly_chart(fig_hist, use_container_width=True)
-
-    col_bin_corr1, col_bin_corr2 = st.columns(2)
-    
-    with col_bin_corr1:
-        target_bin = st.selectbox(
-            "Pilih Fitur Gaya Hidup untuk Cek Frekuensi Jawaban:",
-            options=['sering_terbangun_malam', 'mimpi_buruk', 'minum_kopi_hari_ini', 'merokok', 
-                     'konsumsi_alkohol', 'deadline_hari_ini', 'lembur', 'aktivitas_hobi', 
-                     'konflik_interpersonal', 'merasa_kesepian', 'meditasi']
-        )
-        if target_bin in df.columns:
-            df_bin_counts = df[target_bin].value_counts().reset_index()
-            df_bin_counts.columns = [target_bin, 'Jumlah']
-            fig_bin = px.bar(
-                df_bin_counts, x=target_bin, y='Jumlah', color=target_bin,
-                color_discrete_map={'Tidak': '#2ecc71', 'Ya': '#e74c3c'},
-                title=f"Distribusi Jawaban Variabel Biner - {target_bin.replace('_', ' ').title()}"
-            )
-            st.plotly_chart(fig_bin, use_container_width=True)
-            
-    with col_bin_corr2:
-        df_corr = df.copy()
-        for col in df_corr.select_dtypes(include='object').columns:
-            df_corr[col] = df_corr[col].astype('category').cat.codes
-            
-        korelasi_target = df_corr.corr()['stress_level'].drop('stress_level').sort_values(ascending=False).reset_index()
-        korelasi_target.columns = ['Fitur', 'Nilai Korelasi']
-        korelasi_target['Arah Pengaruh'] = korelasi_target['Nilai Korelasi'].apply(lambda x: 'Memperberat Stres (+)' if x > 0 else 'Meredam Stres (-)')
-        
-        fig_corr = px.bar(
-            korelasi_target, x='Nilai Korelasi', y='Fitur', orientation='h', color='Arah Pengaruh',
-            color_discrete_map={'Memperberat Stres (+)': '#e74c3c', 'Meredam Stres (-)': '#3498db'},
-            title="Pengaruh dan Nilai Korelasi Setiap Fitur terhadap Tingkat Stres"
-        )
-        fig_corr.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="Koefisien Korelasi", yaxis_title="Fitur")
-        st.plotly_chart(fig_corr, use_container_width=True)
-
-    st.write("#### Analisis Karakteristik Pola Hidup vs Kategori Stres (Extended EDA)")
-    col_ex1, col_ex2 = st.columns(2)
-    
-    with col_ex1:
+    with col_eda2:
         if 'durasi_tidur_menit' in df.columns and 'stress_level' in df.columns:
             df_sleep_avg = df.groupby('stress_level')['durasi_tidur_menit'].mean().reset_index()
             df_sleep_avg['stress_level'] = df_sleep_avg['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
@@ -124,23 +56,80 @@ else:
             )
             fig_sleep_bar.update_layout(showlegend=False, xaxis_title="Tingkat Stres", yaxis_title="Rata-rata Durasi Tidur (Menit)")
             st.plotly_chart(fig_sleep_bar, use_container_width=True)
+
+    col_corr1, col_corr2 = st.columns(2)
+    
+    with col_corr1:
+        st.write("#### Matriks Korelasi")
+        df_corr = df.copy()
+        for col in df_corr.select_dtypes(include='object').columns:
+            df_corr[col] = df_corr[col].astype('category').cat.codes
             
-    with col_ex2:
-        exda_select = st.selectbox(
-            "Pilih Parameter Dampak untuk Grouped Bar Analysis:",
-            options=["sering_terbangun_malam", "mimpi_buruk", "merasa_kesepian", "merokok", "konsumsi_alkohol", "meditasi", "aktivitas_hobi"]
+        corr_matrix = df_corr.corr()
+        fig_heatmap = px.imshow(
+            corr_matrix, text_auto=".2f", aspect="auto",
+            color_continuous_scale="RdYlGn",
+            title="Heatmap Korelasi Seluruh Fitur"
         )
-        if exda_select in df.columns:
-            df_exda_group = df.groupby([exda_select, 'stress_level']).size().reset_index(name='Jumlah')
-            df_exda_group['stress_level'] = df_exda_group['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
+        st.plotly_chart(fig_heatmap, use_container_width=True)
+        
+    with col_corr2:
+        st.write("#### Pengaruh Fitur terhadap Stres")
+        df_corr_target = df.copy()
+        for col in df_corr_target.select_dtypes(include='object').columns:
+            df_corr_target[col] = df_corr_target[col].astype('category').cat.codes
             
-            fig_exda_grouped = px.bar(
-                df_exda_group, x='stress_level', y='Jumlah', color=exda_select, barmode='group',
-                color_discrete_map={'Tidak': '#2ecc71', 'Ya': '#e74c3c'},
-                title=f"Proporsi Tingkat Stres Berdasarkan Status {exda_select.replace('_', ' ').title()}"
+        korelasi_target = df_corr_target.corr()['stress_level'].drop('stress_level').sort_values(ascending=False).reset_index()
+        korelasi_target.columns = ['Fitur', 'Nilai Korelasi']
+        korelasi_target['Arah Pengaruh'] = korelasi_target['Nilai Korelasi'].apply(lambda x: 'Memperberat Stres (+)' if x > 0 else 'Meredam Stres (-)')
+        
+        fig_corr = px.bar(
+            korelasi_target, x='Nilai Korelasi', y='Fitur', orientation='h', color='Arah Pengaruh',
+            color_discrete_map={'Memperberat Stres (+)': '#e74c3c', 'Meredam Stres (-)': '#3498db'},
+            title="Korelasi Setiap Fitur terhadap Tingkat Stres"
+        )
+        fig_corr.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="Koefisien Korelasi", yaxis_title="Fitur")
+        st.plotly_chart(fig_corr, use_container_width=True)
+
+    st.subheader("Analisis Karakteristik Pola Hidup vs Kategori Stres (Extended EDA)")
+    col_filter1, col_filter2 = st.columns(2)
+    
+    with col_filter1:
+        chosen_kat = st.selectbox(
+            "Pilih Variabel Kategorikal (Grouped Bar Analysis):",
+            options=['sering_terbangun_malam', 'mimpi_buruk', 'merasa_kesepian', 'meditasi',
+                     'minum_kopi_hari_ini', 'merokok', 'konsumsi_alkohol', 'deadline_hari_ini', 
+                     'lembur', 'aktivitas_hobi', 'jenis_kelamin', 'pekerjaan', 'suasana_hati']
+        )
+        
+        if chosen_kat in df.columns:
+            df_kat_group = df.groupby([chosen_kat, 'stress_level']).size().reset_index(name='Jumlah')
+            df_kat_group['stress_level'] = df_kat_group['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
+            
+            fig_kat_grouped = px.bar(
+                df_kat_group, x='stress_level', y='Jumlah', color=chosen_kat, barmode='group',
+                color_discrete_map={'Tidak': '#2ecc71', 'Ya': '#e74c3c', 'Laki-laki': '#3498db', 'Perempuan': '#e84393', 'Netral': '#f39c12', 'Negatif': '#e74c3c', 'Positif': '#2ecc71'},
+                title=f"Proporsi Tingkat Stres Berdasarkan {chosen_kat.replace('_', ' ').title()}"
             )
-            fig_exda_grouped.update_layout(xaxis_title="Tingkat Stres", yaxis_title="Jumlah Sampel")
-            st.plotly_chart(fig_exda_grouped, use_container_width=True)
+            fig_kat_grouped.update_layout(xaxis_title="Tingkat Stres", yaxis_title="Jumlah Sampel")
+            st.plotly_chart(fig_kat_grouped, use_container_width=True)
+            
+    with col_filter2:
+        chosen_num = st.selectbox(
+            "Pilih Variabel Numerik (Rata-rata per Kelas Stres):",
+            options=["usia", "durasi_tidur_menit", "screen_sebelum_tidur", "jam_kerja_menit", "waktu_outdoor", "tingkat_kecemasan"]
+        )
+        if chosen_num in df.columns:
+            df_num_avg = df.groupby('stress_level')[chosen_num].mean().reset_index()
+            df_num_avg['stress_level'] = df_num_avg['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'})
+            
+            fig_num_bar = px.bar(
+                df_num_avg, x='stress_level', y=chosen_num, color='stress_level',
+                color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
+                title=f"Rata-rata {chosen_num.replace('_', ' ').title()} Berdasarkan Tingkat Stres"
+            )
+            fig_num_bar.update_layout(showlegend=False, xaxis_title="Tingkat Stres", yaxis_title=f"Rata-rata {chosen_num.replace('_', ' ').title()}")
+            st.plotly_chart(fig_num_bar, use_container_width=True)
 
     st.info(
         "Kesimpulan Analisis Data & Model: \n"
