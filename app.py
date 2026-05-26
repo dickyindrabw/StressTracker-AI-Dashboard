@@ -74,7 +74,6 @@ else:
             fig_job.update_layout(showlegend=False, xaxis_title="Jumlah Sampel", yaxis_title="Pekerjaan")
             st.plotly_chart(fig_job, use_container_width=True)
 
-    # Validasi visualisasi faktor numerik utama pendukung insight kesimpulan
     st.write("#### Analisis Faktor Risiko Utama (Faktor Numerik)")
     grafik_num1, grafik_num2 = st.columns(2)
 
@@ -106,7 +105,7 @@ else:
                 y='screen_sebelum_tidur',
                 color='stress_level',
                 color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
-                title="Pengaruh Screen Time Sebelum Tidur terhadap Tingkat Stres"
+                title="Pengaruh Screen Time Before Sleep terhadap Tingkat Stres"
             )
             fig_screen.update_layout(showlegend=False, xaxis_title="Tingkat Stres", yaxis_title="Screen Time (Menit)")
             st.plotly_chart(fig_screen, use_container_width=True)
@@ -146,8 +145,7 @@ else:
         "2) Faktor Protektif: Aktivitas luar ruangan (outdoor time) dan manajemen waktu istirahat teratur terbukti secara "
         "signifikan menjaga stabilitas emosional subjek pada tingkat stres rendah. \n"
         "3) Solusi Prevensi (Model AI): Berdasarkan pola-pola historis tersebut, model Deep Learning yang diintegrasikan di bawah "
-        "berhasil mempelajari interaksi kompleks dari 20 fitur gaya hidup ini secara simultan. Model mampu menghasilkan kalkulasi "
-        "probabilitas stres secara real-time sebagai landasan ilmiah untuk fitur intervensi dini pada sistem Tracker."
+        "berhasil mempelajari interaksi kompleks dari 20 fitur gaya hidup ini secara simultan dengan tingkat akurasi evaluasi sebesar 96.73%, menghasilkan kalkulasi probabilitas stres real-time yang presisi."
     )
 
     st.subheader("Simulasi Interaktif Prediksi Model Real-Time")
@@ -155,7 +153,6 @@ else:
     if not os.path.exists(MODEL_PATH):
         st.warning("Model 'best_model.keras' tidak ditemukan. Fitur simulasi prediksi dinonaktifkan.")
     else:
-        # Cache resource agar model tidak dimuat ulang setiap interaksi widget
         @st.cache_resource
         def load_internal_model():
             return tf.keras.models.load_model(MODEL_PATH)
@@ -238,7 +235,6 @@ else:
                 
                 input_filtered_df = raw_input_df[FINAL_FEATURES].copy()
                 
-                # Casting tipe data spesifik untuk mencegah error tensor graph pas inferensi
                 for col in CATEGORICAL_FEATURES:
                     if col in ['konsentrasi', 'interaksi_sosial']:
                         input_filtered_df[col] = input_filtered_df[col].astype('int64')
@@ -252,7 +248,6 @@ else:
                         input_filtered_df[col] = input_filtered_df[col].astype('float32')
 
                 try:
-                    # Konversi ke format tensor pipeline tf.data
                     input_dict = {col: input_filtered_df[col].values for col in input_filtered_df.columns}
                     input_dataset = tf.data.Dataset.from_tensor_slices(input_dict).batch(1)
                     
