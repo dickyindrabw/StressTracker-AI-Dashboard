@@ -139,12 +139,12 @@ else:
         st.plotly_chart(fig_interaktif, use_container_width=True)
 
     st.info(
-        "Kesimpulan Analisis Data & Model: "
+        "Kesimpulan Analisis Data & Model: \n"
         "1) Faktor Risiko Utama: Hasil EDA menunjukkan korelasi kuat antara durasi tidur yang tidak ideal (di bawah 7 jam) "
         "serta tingginya screen time sebelum tidur terhadap peningkatan risiko stres tingkat tinggi. Pola ini diperkuat oleh "
-        "tingginya prevalensi gangguan tidur berupa mimpi buruk pada kelompok stres kronis. "
+        "tingginya prevalensi gangguan tidur berupa mimpi buruk pada kelompok stres kronis. \n"
         "2) Faktor Protektif: Aktivitas luar ruangan (outdoor time) dan manajemen waktu istirahat teratur terbukti secara "
-        "signifikan menjaga stabilitas emosional subjek pada tingkat stres rendah. "
+        "signifikan menjaga stabilitas emosional subjek pada tingkat stres rendah. \n"
         "3) Solusi Prevensi (Model AI): Berdasarkan pola-pola historis tersebut, model Deep Learning yang diintegrasikan di bawah "
         "berhasil mempelajari interaksi kompleks dari 20 fitur gaya hidup ini secara simultan. Model mampu menghasilkan kalkulasi "
         "probabilitas stres secara real-time sebagai landasan ilmiah untuk fitur intervensi dini pada sistem Tracker."
