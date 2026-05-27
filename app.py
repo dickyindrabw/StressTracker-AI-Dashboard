@@ -22,7 +22,7 @@ if not os.path.exists(CSV_PATH):
 else:
     df = pd.read_csv(CSV_PATH)
 
-    st.subheader("Exploratory Data Analysis (EDA)")
+    st.subheader("Analisis Data")
     
     col_eda1, col_eda2 = st.columns(2)
     
@@ -43,38 +43,6 @@ else:
             st.plotly_chart(fig_stress, use_container_width=True)
             
     with col_eda2:
-        chosen_num_eda = st.selectbox(
-            "Pilih Fitur untuk Melihat Sebaran Data Kontinu:",
-            options=["usia", "durasi_tidur_menit", "screen_sebelum_tidur", "jam_kerja_menit", "waktu_outdoor", "tingkat_kecemasan"]
-        )
-        if chosen_num_eda in df.columns:
-            fig_hist = px.histogram(
-                df, x=chosen_num_eda, color_discrete_sequence=['#3498db'],
-                title=f"Distribusi Feature Numerikal - {chosen_num_eda.replace('_', ' ').title()}"
-            )
-            fig_hist.update_traces(opacity=0.85)
-            st.plotly_chart(fig_hist, use_container_width=True)
-
-    col_eda3, col_eda4 = st.columns(2)
-    
-    with col_eda3:
-        chosen_bin_eda = st.selectbox(
-            "Pilih Fitur untuk Melihat Frekuensi Data Kategorikal:",
-            options=['sering_terbangun_malam', 'mimpi_buruk', 'merasa_kesepian', 'meditasi',
-                     'minum_kopi_hari_ini', 'merokok', 'konsumsi_alkohol', 'deadline_hari_ini', 
-                     'lembur', 'aktivitas_hobi', 'jenis_kelamin', 'pekerjaan', 'suasana_hati']
-        )
-        if chosen_bin_eda in df.columns:
-            df_bin_counts = df[chosen_bin_eda].value_counts().reset_index()
-            df_bin_counts.columns = [chosen_bin_eda, 'Jumlah']
-            fig_bin = px.bar(
-                df_bin_counts, x=chosen_bin_eda, y='Jumlah', color=chosen_bin_eda,
-                color_discrete_sequence=px.colors.qualitative.Pastel,
-                title=f"Distribusi Data Biner/Kategorikal - {chosen_bin_eda.replace('_', ' ').title()}"
-            )
-            st.plotly_chart(fig_bin, use_container_width=True)
-
-    with col_eda4:
         df_corr_target = df.copy()
         for col in df_corr_target.select_dtypes(include='object').columns:
             df_corr_target[col] = df_corr_target[col].astype('category').cat.codes
@@ -91,7 +59,7 @@ else:
         fig_corr.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="Koefisien Korelasi", yaxis_title="Fitur")
         st.plotly_chart(fig_corr, use_container_width=True)
 
-    st.write("#### Matriks Heatmap Korelasi Linear Penuh (EDA)")
+    st.write("#### Matriks Heatmap Korelasi Linear Penuh")
     df_corr_full = df.copy()
     for col in df_corr_full.select_dtypes(include='object').columns:
         df_corr_full[col] = df_corr_full[col].astype('category').cat.codes
@@ -106,13 +74,13 @@ else:
     st.plotly_chart(fig_heatmap, use_container_width=True)
 
     st.markdown("---")
-    st.subheader("Explanatory Data Analysis (ExDA)")
+    st.subheader("Analisis Karakteristik Kelompok")
     
     col_exda1, col_exda2 = st.columns(2)
     
     with col_exda1:
         chosen_kat_exda = st.selectbox(
-            "Pilih Faktor Dampak Gaya Hidup (Explanatory Grouped Bar Analysis):",
+            "Pilih Faktor Dampak Gaya Hidup (Grouped Bar Analysis):",
             options=['sering_terbangun_malam', 'mimpi_buruk', 'merasa_kesepian', 'meditasi',
                      'minum_kopi_hari_ini', 'merokok', 'konsumsi_alkohol', 'deadline_hari_ini', 
                      'lembur', 'aktivitas_hobi', 'jenis_kelamin', 'pekerjaan', 'suasana_hati']
@@ -132,7 +100,7 @@ else:
             
     with col_exda2:
         chosen_num_exda = st.selectbox(
-            "Pilih Faktor Numerik Kontinu (Explanatory Mean Analysis):",
+            "Pilih Faktor Numerik Kontinu (Mean Analysis):",
             options=["durasi_tidur_menit", "screen_sebelum_tidur", "jam_kerja_menit", "waktu_outdoor", "tingkat_kecemasan", "usia"]
         )
         if chosen_num_exda in df.columns:
@@ -267,3 +235,5 @@ else:
                         
                 except Exception as e:
                     st.error("Gagal mengeksekusi inferensi real-time pada model internal.")
+
+st.caption("StressTracker AI Capstone Project CC26-PSU292 - 2026")
