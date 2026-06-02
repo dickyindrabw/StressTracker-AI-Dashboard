@@ -217,4 +217,4 @@ else:
                 except Exception as e:
                     st.error("Gagal mengeksekusi inferensi real-time pada model internal.")
 
-st.caption("StressTracker AI DS Capstone Project - 2026")
+st.caption("StressTracker AI Capstone Project - 2026")
