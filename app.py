@@ -24,40 +24,21 @@ else:
 
     st.subheader("Analisis Data")
     
-    col_eda1, col_eda2 = st.columns(2)
-    
-    with col_eda1:
-        if 'stress_level' in df.columns:
-            df_stress = df['stress_level'].map({1: 'Rendah', 2: 'Sedang', 3: 'Tinggi'}).value_counts(normalize=True).reset_index()
-            df_stress.columns = ['Tingkat Stres', 'Persentase']
-            df_stress['Persentase'] = df_stress['Persentase'] * 100
-            
-            fig_stress = px.bar(
-                df_stress, x='Tingkat Stres', y='Persentase', color='Tingkat Stres',
-                color_discrete_map={'Rendah': '#2ecc71', 'Sedang': '#f39c12', 'Tinggi': '#e74c3c'},
-                text=df_stress['Persentase'].apply(lambda x: f"{x:.2f}%"),
-                title="Distribusi Tingkat Stres Target (Persentase)"
-            )
-            fig_stress.update_layout(showlegend=False, xaxis_title="Kategori Stres", yaxis_title="Persentase (%)")
-            fig_stress.update_traces(textposition='outside')
-            st.plotly_chart(fig_stress, use_container_width=True)
-            
-    with col_eda2:
-        df_corr_target = df.copy()
-        for col in df_corr_target.select_dtypes(include='object').columns:
-            df_corr_target[col] = df_corr_target[col].astype('category').cat.codes
-            
-        korelasi_target = df_corr_target.corr()['stress_level'].drop('stress_level').sort_values(ascending=False).reset_index()
-        korelasi_target.columns = ['Fitur', 'Nilai Korelasi']
-        korelasi_target['Arah Pengaruh'] = korelasi_target['Nilai Korelasi'].apply(lambda x: 'Memperberat Stres (+)' if x > 0 else 'Meredam Stres (-)')
+    df_corr_target = df.copy()
+    for col in df_corr_target.select_dtypes(include='object').columns:
+        df_corr_target[col] = df_corr_target[col].astype('category').cat.codes
         
-        fig_corr = px.bar(
-            korelasi_target, x='Nilai Korelasi', y='Fitur', orientation='h', color='Arah Pengaruh',
-            color_discrete_map={'Memperberat Stres (+)': '#e74c3c', 'Meredam Stres (-)': '#3498db'},
-            title="Korelasi Antar Feature Terhadap Target (stress_level)"
-        )
-        fig_corr.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="Koefisien Korelasi", yaxis_title="Fitur")
-        st.plotly_chart(fig_corr, use_container_width=True)
+    korelasi_target = df_corr_target.corr()['stress_level'].drop('stress_level').sort_values(ascending=False).reset_index()
+    korelasi_target.columns = ['Fitur', 'Nilai Korelasi']
+    korelasi_target['Arah Pengaruh'] = korelasi_target['Nilai Korelasi'].apply(lambda x: 'Memperberat Stres (+)' if x > 0 else 'Meredam Stres (-)')
+    
+    fig_corr = px.bar(
+        korelasi_target, x='Nilai Korelasi', y='Fitur', orientation='h', color='Arah Pengaruh',
+        color_discrete_map={'Memperberat Stres (+)': '#e74c3c', 'Meredam Stres (-)': '#3498db'},
+        title="Korelasi Antar Feature Terhadap Target (stress_level)"
+    )
+    fig_corr.update_layout(yaxis={'categoryorder':'total ascending'}, xaxis_title="Koefisien Korelasi", yaxis_title="Fitur", height=500)
+    st.plotly_chart(fig_corr, use_container_width=True)
 
     st.write("#### Matriks Heatmap Korelasi Linear Penuh")
     df_corr_full = df.copy()
@@ -236,4 +217,4 @@ else:
                 except Exception as e:
                     st.error("Gagal mengeksekusi inferensi real-time pada model internal.")
 
-st.caption("StressTracker AI Capstone Project CC26-PSU292 - 2026")
+st.caption("StressTracker AI DS Capstone Project - 2026")
