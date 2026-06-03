@@ -39,11 +39,17 @@ StressTracker AI hadir sebagai solusi praktis berbasis data science untuk mendet
 ## Struktur Direktori Repositori
 
 ```text
+├── .devcontainer/                    # Konfigurasi container untuk lingkungan pengembangan
 ├── Data Bersih/
 │   └── StressTracker_Clean.csv       # Dataset bersih hasil wrangling (30.177 baris)
+├── Data Kotor/                       # Repositori penyimpanan dataset mentah sebelum pembersihan
+├── modelAPI/                         # Sistem backend berbasis REST API untuk model inferece
+├── .gitignore                        # Berkas konfigurasi pengabaian pelacakan Git
+├── Prosesing and Modelling Data.ipynb # Notebook dokumentasi end-to-end data pipeline & modeling
+├── README.md                         # Dokumentasi utama proyek
 ├── app.py                            # Kode utama aplikasi dashboard Streamlit
-├── best_model.keras                  # File bobot model Deep Learning terkompilasi
-└── README.md                         # Dokumentasi proyek
+├── best_model.keras                  # Berkas bobot model Deep Learning terkompilasi
+└── requirements.txt                  # Daftar dependensi dan pustaka Python proyek
 
 ```
 
@@ -53,7 +59,7 @@ Ikuti langkah-langkah di bawah ini untuk memasang dan menjalankan aplikasi ini s
 
 ### 1. Unduh dan Instal Python
 
-Pastikan laptop Anda sudah terinstal Python (disarankan menggunakan Python versi 3.9, 3.10, atau 3.11 untuk stabilitas pustaka TensorFlow). Anda dapat mengunduhnya melalui situs resmi python.org. Pastikan untuk mencentang pilihan "Add Python to PATH" saat proses instalasi berlangsung.
+Pastikan laptop Anda sudah terinstal Python (disarankan menggunakan Python versi 3.10, 3.11, atau 3.12 untuk stabilitas pustaka TensorFlow). Anda dapat mengunduhnya melalui situs resmi python.org. Pastikan untuk mencentang pilihan "Add Python to PATH" saat proses instalasi berlangsung.
 
 ### 2. Kloning Repositori Proyek
 
