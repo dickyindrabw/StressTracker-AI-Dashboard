@@ -118,3 +118,13 @@ Berdasarkan pengujian ketat pada data independen (testing set) yang dilakukan ol
 
 * Akurasi Pengujian Final: 96.73% (Melampaui target minimal evaluasi proyek awal sebesar 85%).
 * Nilai Precision, Recall, & F1-Score: Stabil di rentang 0.95 hingga 0.98 untuk ketiga kelas target (Rendah, Sedang, Tinggi), menunjukkan kemampuan generalisasi model yang sangat baik terhadap data baru.
+  
+## Tautan Model ML
+
+Model Deep Learning yang digunakan dapat diunduh melalui tautan berikut:
+
+| File | Deskripsi | Tautan |
+|------|-----------|--------|
+| best_model.keras | Model utama dashboard Streamlit | [Download]([https://drive.google.com/...](https://drive.google.com/file/d/1wk8PygVp1b4Kjn3kRC7mUpWuZAds_XyT/view?usp=sharing)) |
+| best_model_fixed2.keras | Model untuk REST API inference | [Download]([https://drive.google.com/...](https://drive.google.com/file/d/1m1of-oHfweTqUJeCVAzjA1vKvEoF5AbV/view?usp=sharing)) |
+|------|-----------|--------|
